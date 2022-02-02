@@ -17,7 +17,12 @@
   ],
   "tags": [
     {
-      "name": "Analysis"
+      "name": "Analysis",
+      "description": "Submit analysis and get data"
+    },
+    {
+      "name": "Available Objects",
+      "description": "Get informations about available objects you can use to build Analysis"
     }
   ],
   "components": {
@@ -37,6 +42,7 @@
     "schemas": {
       "FilterPredictateEnum": {
         "type": "string",
+        "description": "Filter predicates",
         "enum": [
           "EQUAL",
           "UNEQUAL",
@@ -51,6 +57,7 @@
       },
       "ConnectorPredictateEnum": {
         "type": "string",
+        "description": "Connectors",
         "enum": [
           "AND",
           "OR"
@@ -65,6 +72,7 @@
       },
       "ContextEnum": {
         "type": "string",
+        "description": "Context to evaluate the metric/dimension. If context property is not given or empty the default context of the object will be used. The default context can be identified from the context property in the response list of /query-objects.",
         "enum": [
           "VISITOR",
           "SESSION",
@@ -369,7 +377,7 @@
           }
         }
       },
-      "Issue" : {
+      "Issue": {
         "type": "object",
         "properties": {
           "name": {
@@ -425,13 +433,13 @@
             "type": "string",
             "description": "Detailed informations about the problem"
           },
-          "errors" : {
+          "errors": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Issue"
             }
           },
-          "warnings" : {
+          "warnings": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Issue"
@@ -472,6 +480,254 @@
             }
           }
         }
+      },
+      "DataTypeEnum": {
+        "type": "string",
+        "description": "Type of data",
+        "enum": [
+          "STRING",
+          "NUMBER",
+          "GENERIC"
+        ]
+      },
+      "DisplayTypeEnum": {
+        "type": "string",
+        "description": "Indicate how the data should be displayed",
+        "enum": [
+          "NORMAL",
+          "TIME",
+          "CURRENCY",
+          "DISTRIBUTION",
+          "COMPARE"
+
+        ]
+      },
+      "ElementTypeEnum": {
+        "type": "string",
+        "description": "Type of element",
+        "enum": [
+          "CAMPAIGNS_ATTRIBUTION",
+          "CUSTOM_CATEGORY",
+          "CUSTOM_FORMULA",
+          "CUSTOM_METRIC",
+          "CUSTOM_PARAMETER",
+          "CUSTOM_PROCESS",
+          "CUSTOM_SOURCE",
+          "CUSTOM_VISITOR_GROUPS_TRAFFIC",
+          "CUSTOM_WEBSITE_GOALS",
+          "DEFAULT_DIMENSION",
+          "DEFAULT_METRIC",
+          "PREDEFINED_FORMULA",
+          "PREDEFINED_METRIC"
+        ]
+      },
+      "Metric": {
+        "title": "Metric",
+        "type": "object",
+        "description": "Description of a metric",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "API name of the metric"
+          },
+          "dataType": {
+            "$ref": "#/components/schemas/DataTypeEnum"
+          },
+          "title": {
+            "type": "string",
+            "description": "Human readable name of the metric. Localized"
+          },
+          "elementType": {
+            "$ref": "#/components/schemas/ElementTypeEnum"
+          },
+          "metricDisplayType": {
+            "$ref": "#/components/schemas/DisplayTypeEnum"
+          },
+          "context": {
+            "$ref": "#/components/schemas/ContextEnum"
+          }
+        },
+        "required": [
+          "name",
+          "dataType",
+          "title",
+          "elementType",
+          "metricDisplayType"
+        ]
+      },
+      "Dimension": {
+        "title": "DimensionObject",
+        "type": "object",
+        "description": "Description of a Dimension element",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "API name of the dimension"
+          },
+          "dataType": {
+            "$ref": "#/components/schemas/DataTypeEnum"
+          },
+          "title": {
+            "type": "string",
+            "description": "Human readable name of the metric. Localized"
+          },
+          "elementType": {
+            "$ref": "#/components/schemas/ElementTypeEnum"
+          },
+          "context": {
+            "$ref": "#/components/schemas/ContextEnum"
+          },
+          "mapping": {
+            "type": "object",
+            "description": "Optional list of Mapping values",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "timeFormatPattern": {
+            "description": "Standard datetime pattern. Indicates that current STRING represents a Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "dataType",
+          "title",
+          "elementType"
+        ]
+      },
+      "QueryObjects": {
+        "title": "QueryObjects",
+        "type": "object",
+        "properties": {
+          "metrics": {
+            "type": "array",
+            "description": "List of available metrics",
+            "items": {
+              "$ref": "#/components/schemas/Metric"
+            }
+          },
+          "dimensions": {
+            "type": "array",
+            "description": "List of available dimensions",
+            "items": {
+              "$ref": "#/components/schemas/Dimension"
+            }
+          }
+        },
+        "required": [
+          "metrics",
+          "dimensions"
+        ]
+      },
+      "SegmentDefinition": {
+        "title": "SegmentDefinition",
+        "description": "User segment",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID of the segment to be used in analysis"
+          },
+          "title": {
+            "type": "string",
+            "description": "Name of the segment"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the segment"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "description"
+        ]
+      },
+      "DynamicTimeFilterDefinition": {
+        "title": "DynamicTimeFilterDefinition",
+        "description": "Dynamic Time Filter",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Human readable description of the dynamic time filter (localized)"
+          },
+          "name": {
+            "type": "string",
+            "description": "API name of the filter value"
+          },
+          "dynamicFilter": {
+            "type": "object",
+            "description": "Snippet code which can be used in analysis",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "API Name of the filtered dimension"
+              },
+              "filterPredicate": {
+                "$ref": "#/components/schemas/FilterPredictateEnum"
+              },
+              "connector": {
+                "$ref": "#/components/schemas/ConnectorPredictateEnum"
+              },
+              "context": {
+                "$ref": "#/components/schemas/ContextEnum"
+              },
+              "value1": {
+                "type": "string",
+                "description": "Value to be filtered on."
+              },
+              "value2": {
+                "type": "string",
+                "description": "Second value to be filtered on. Only relevant for BETWEEN."
+              }
+            },
+            "required": [
+              "name",
+              "connector",
+              "filterPredicate",
+              "value1",
+              "value2",
+              "context"
+            ]
+          }
+        },
+
+        "required": [
+          "title",
+          "name",
+          "dynamicFilter"
+        ]
+      },
+      "AnalysisUsage": {
+        "title": "AnalysisUsage",
+        "description": "Analysis Usage for a given period",
+        "type": "object",
+        "properties": {
+          "calculationsCount": {
+            "type": "integer",
+            "description": "Number of calculation for the current period"
+          },
+          "maxCalculationsAllowed": {
+            "type": "integer",
+            "description": "Max number of allowed of calculation per Month as defined in contract"
+          },
+          "month": {
+            "type": "integer",
+            "description": "month of the current period"
+          },
+          "year": {
+            "type": "integer",
+            "description": "Year of the current period"
+          }
+        },
+        "required": [
+          "calculationsCount",
+          "maxCalculationsAllowed",
+          "month",
+          "year"
+        ]
       }
     },
     "responses": {
@@ -746,6 +1002,203 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/analysis-usage/current": {
+      "get": {
+        "tags": [
+          "Analysis"
+        ],
+        "summary": "Get number of analysis done for current month",
+        "description": "Get number of analysis done for current month",
+        "externalDocs": {
+          "url": "https://documentation.mapp.com"
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisUsage"
+                },
+                "examples": {
+                  "AnalysisUsage": {
+                    "value": {
+                      "calculationsCount": 4012,
+                      "maxCalculationsAllowed": 310000,
+                      "month": 1,
+                      "year": 2022
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/query-objects": {
+      "get": {
+        "tags": [
+          "Available Objects"
+        ],
+        "summary": "List all available dimensions and metrics",
+        "description": "List all available dimensions and metrics",
+        "externalDocs": {
+          "url": "https://documentation.mapp.com"
+        },
+        "parameters": [
+          {
+            "name": "language",
+            "in": "query",
+            "description": "Optional standard ISO-639-1 language code for translation (when applicable).\n\nOnly \"de\" and \"en\" supported for the moment. \n\nDefault is  \"en\"",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueryObjects"
+                },
+                "examples": {
+                  "Query Objects": {
+                    "$ref": "./query-objects.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/segments": {
+      "get": {
+        "tags": [
+          "Available Objects"
+        ],
+        "summary": "List all available segments",
+        "description": "List all available segments",
+        "externalDocs": {
+          "url": "https://documentation.mapp.com"
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SegmentDefinition"
+                },
+                "examples": {
+                  "Segments": {
+                    "value": [
+                      {
+                        "id": 67,
+                        "title": "Social media Visitor",
+                        "description": "Visitor which came from Social Media"
+                      },
+                      {
+                        "id": 95,
+                        "title": "Returning Visitor",
+                        "description": "User with at least 5 Visits"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/dynamic-timefilters": {
+      "get": {
+        "tags": [
+          "Available Objects"
+        ],
+        "summary": "List all available dynamic timefilters",
+        "description": "List all available dynamic timefilter value.",
+        "externalDocs": {
+          "url": "https://documentation.mapp.com"
+        },
+        "parameters": [
+          {
+            "name": "language",
+            "in": "query",
+            "description": "Optional standard ISO-639-1 language code for translation (when applicable).\n\nOnly \"de\" and \"en\" supported for the moment. \n\nDefault is  \"en\"",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DynamicTimeFilterDefinition"
+                },
+                "examples": {
+                  "DynamicTimeFilters": {
+                    "value": [
+                      {
+                        "title": "Today",
+                        "name": "today",
+                        "dynamicFilter": {
+                          "name": "time_dynamic",
+                          "connector": "AND",
+                          "filterPredicate": "LIKE",
+                          "value1": "today",
+                          "value2": "",
+                          "context": "NONE"
+                        }
+                      },
+                      {
+                        "title": "Today, 7 days ago",
+                        "name": "before_7_days",
+                        "dynamicFilter": {
+                          "name": "time_dynamic",
+                          "connector": "AND",
+                          "filterPredicate": "LIKE",
+                          "value1": "before_7_days",
+                          "value2": "",
+                          "context": "NONE"
+                        }
+                      },
+                      {
+                        "title": "Today, 14 days ago",
+                        "name": "before_14_days",
+                        "dynamicFilter": {
+                          "name": "time_dynamic",
+                          "connector": "AND",
+                          "filterPredicate": "LIKE",
+                          "value1": "before_14_days",
+                          "value2": "",
+                          "context": "NONE"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
           }
         }
       }
