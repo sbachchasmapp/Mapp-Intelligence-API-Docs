@@ -284,8 +284,8 @@ components:
         name:
           type: string
           description: |-
-            Each warnings has specific properties described in following table:
-            | Warning| Description | Relevant parameters |
+            Each information has specific properties described in following table:
+            | Information| Description | Relevant parameters |
             | ---------------- | ------------| -----------------------------------|
             | SortingEnforced |  Sorting criteria has been added automatically | List of objects that were sorted automatically in _aliases_ array. |
             | NoSortingDefined |  Sorting criteria is required for some dimensions. | List of dimensions requiring a sorting in _names_ array. |
@@ -301,17 +301,17 @@ components:
           properties:
             arrangeTypes:
               type: array
-              description: List of internal object names (dimension, metrics, filter, ...) that corresponds to the warning.
+              description: List of internal object names (dimension, metrics, filter, ...) that corresponds to the information.
               items:
                 type: string
             aliases:
               type: array
-              description: List of columns aliases that corresponds to the error. See Result Header alias property.
+              description: List of columns aliases that corresponds to the information. See Result Header alias property.
               items:
                 type: string
             names:
               type: array
-              description: List of object names (dimension, metrics, filter, ...) that corresponds to the warning.
+              description: List of object names (dimension, metrics, filter, ...) that corresponds to the information.
               items:
                 type: string
             daysInDataSource:
@@ -346,7 +346,7 @@ components:
                 type: string
             aliases:
               type: array
-              description: List of columns aliases that corresponds to the error. See Result Header alias property.
+              description: List of columns aliases that corresponds to the warning. See Result Header alias property.
               items:
                 type: string
             names:
