@@ -256,6 +256,11 @@ components:
         columnCount:
           type: integer
           description: Number of columns
+        information:
+          type: array
+          description: Array of information regarding calculation
+          items:
+            $ref: '#/components/schemas/Information'
         warnings:
           type: array
           description: Array of warnings occurred during calculation
@@ -273,6 +278,48 @@ components:
           type: string
           format: date-time
           description: Timestamp of the calculation
+    Information:
+      type: object
+      properties:
+        name:
+          type: string
+          description: |-
+            Each warnings has specific properties described in following table:
+            | Warning| Description | Relevant parameters |
+            | ---------------- | ------------| -----------------------------------|
+            | SortingEnforced |  Sorting criteria has been added automatically | List of objects that were sorted automatically in _aliases_ array. |
+            | NoSortingDefined |  Sorting criteria is required for some dimensions. | List of dimensions requiring a sorting in _names_ array. |
+            | SortingLimitExceeded | 3 sorting criteria are allowed. All additional sorting criteria have been omitted.| List of columns ignored for sorting in _aliases_ array. |
+            | SortingRemoved | A requested sorting criteria has been removed | List of objects that were removed automatically in _aliases_ array. |
+          enum:
+            - SortingEnforced
+            - NoSortingDefined
+            - SortingLimitExceeded
+            - SortingRemoved
+        parameters:
+          type: object
+          properties:
+            arrangeTypes:
+              type: array
+              description: List of internal object names (dimension, metrics, filter, ...) that corresponds to the warning.
+              items:
+                type: string
+            aliases:
+              type: array
+              description: List of columns aliases that corresponds to the error. See Result Header alias property.
+              items:
+                type: string
+            names:
+              type: array
+              description: List of object names (dimension, metrics, filter, ...) that corresponds to the warning.
+              items:
+                type: string
+            daysInDataSource:
+              type: string
+              description: Number of days in the datasource which is beeing cut
+            todayDate:
+              type: string
+              description: Date of the day being cut
     Warning:
       type: object
       properties:
@@ -284,18 +331,10 @@ components:
             | ---------------- | ------------| -----------------------------------|
             | FilterLogicalCubeMismatch | At least one filter is ignored due to incompatibily with Dimensions and Metrics used. | List of incomptible filter objects in _names_ array. |
             | InvalidMetricContext | Metric used in an invalid context. | List of metric with invalid context in _aliases_ array. |
-            | SortingEnforced |  Sorting criteria has been added automatically | List of objects that were sorted automatically in _aliases_ array. |
-            | NoSortingDefined |  Sorting criteria is required for some dimensions. | List of dimensions requiring a sorting in _names_ array. |
-            | SortingLimitExceeded | 3 sorting criteria are allowed. All additional sorting criteria have been omitted.| List of columns ignored for sorting in _aliases_ array. |
-            | SortingRemoved | A requested sorting criteria has been removed | List of objects that were removed automatically in _aliases_ array. |
             | TodayRemoved | Today date has been removed from calculation time range because the selected datasource does not contain it. | daysInDataSource, todayDate|
           enum:
             - FilterLogicalCubeMismatch
             - InvalidMetricContext
-            - SortingEnforced
-            - NoSortingDefined
-            - SortingLimitExceeded
-            - SortingRemoved
             - TodayRemoved
         parameters:
           type: object
