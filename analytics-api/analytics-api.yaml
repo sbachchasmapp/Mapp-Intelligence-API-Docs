@@ -73,6 +73,34 @@ components:
         - ANALYSIS
         - COLUMN
         - ELEMENT
+    SortDirectionEnum:
+      type: string
+      description: Possible sorting directions
+      enum:
+        - ASCENDING
+        - DESCENDING
+    Filter:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the Metric or Dimension being filtered.
+        filterPredicate:
+          $ref: '#/components/schemas/FilterPredicateEnum'
+        connector:
+          $ref: '#/components/schemas/ConnectorPredicateEnum'
+        caseSensitive:
+          type: boolean
+        context:
+          $ref: '#/components/schemas/ContextEnum'
+        intern:
+          type: boolean
+          description: Indicates if filter should be prioritized (Advanced).
+          default: false
+        value1:
+          type: string
+        value2:
+          type: string
     Container:
       type: object
       properties:
@@ -80,28 +108,7 @@ components:
           type: array
           description: Array of filters
           items:
-            type: object
-            description: Filter
-            properties:
-              name:
-                type: string
-                description: Name of the Metric or Dimension being filtered
-              filterPredicate:
-                $ref: '#/components/schemas/FilterPredicateEnum'
-              connector:
-                $ref: '#/components/schemas/ConnectorPredicateEnum'
-              caseSensitive:
-                type: boolean
-              context:
-                $ref: '#/components/schemas/ContextEnum'
-              intern:
-                type: boolean
-                description: Indicates if filter should be prioritized, (Advanced)
-                default: false
-              value1:
-                type: string
-              value2:
-                type: string
+            $ref: '#/components/schemas/Filter'
         containers:
           type: array
           description: array of containers (recursion)
@@ -119,8 +126,177 @@ components:
             - TIME_ORDER
         inOrNotIn:
           $ref: '#/components/schemas/InOrNotInPredicateEnum'
+    KpiQuery:
+      type: object
+      description: KPI query definition
+      properties:
+        elementPeriod:
+          type: string
+          description: |-
+            One of the following periods should be used:
+            * ELEMENT: when the time filter is either inherited from the report or the time filter configured in the report element configuration.
+            * MONAD: when the time filter is inherited from the custom metric configuration.
+          enum:
+            - ELEMENT
+            - MONAD
+        type:
+          type: string
+          description: Type of the query
+          enum:
+            - KPI
+            - SPARKLINE
+        metricName:
+          type: string
+          description: name of the metric of the KPI
+        dimensionName:
+          type: string
+          description: name of the dimension of the KPI
+        comparison:
+          $ref: '#/components/schemas/Comparison'
+        predefinedContainer:
+          $ref: '#/components/schemas/Container'
+        predefinedSegmentConnections:
+          type: array
+          items:
+            $ref: '#/components/schemas/Filter'
+    TableQuery:
+      type: object
+      description: Tabular query definition
+      properties:
+        columns:
+          type: array
+          description: Array of columns
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              sortDirection:
+                $ref: '#/components/schemas/SortDirectionEnum'
+              sortIndex:
+                type: integer
+                description: Indicates order of sorting when there is more than one sorting column. (starting from 0).
+              lowerLimit:
+                type: integer
+              upperLimit:
+                type: integer
+              columnPeriod:
+                $ref: '#/components/schemas/ColumnPeriodEnum'
+              scope:
+                $ref: '#/components/schemas/ScopeEnum'
+              context:
+                $ref: '#/components/schemas/ContextEnum'
+              predefinedContainer:
+                $ref: '#/components/schemas/Container'
+        variant:
+          type: string
+          description: Type of Data Structure
+          enum:
+            - LIST
+            - PIVOT
+            - PIVOT_AS_LIST
+            - COMPARISON
+        predefinedContainer:
+          $ref: '#/components/schemas/Container'
+        predefinedSegmentConnections:
+          type: array
+          items:
+            $ref: '#/components/schemas/Filter'
+        viewMode:
+          $ref: '#/components/schemas/ComparisonViewMode'
+      required:
+        - columns
+        - variant
+        - predefinedContainer
+    ComparisonViewMode:
+      type: object
+      properties:
+        active:
+          type: string
+          enum:
+            - comparison
+        comparison:
+          type: object
+          properties:
+            type:
+              type: string
+              description: type of comparison. It can be either on *time* or *segment*. The corresponding properties
+                must be filled accordingly in *values* and *sorting*
+              enum:
+                - time
+                - segment
+            values:
+              type: object
+              properties:
+                time:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Filter'
+                segment:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/SegmentContainer'
+            sorting:
+              type: object
+              properties:
+                time:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ViewModeComparisonSortingItem'
+                segment:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ViewModeComparisonSortingItem'
+    ViewModeComparisonSortingItem:
+      type: object
+      description: Sorting of comparison
+      properties:
+        alias:
+          type: string
+          description: alias of the column being sorted
+        direction:
+          $ref: '#/components/schemas/SortDirectionEnum'
+    SegmentContainer:
+      type: object
+      properties:
+        segmentID:
+          type: string
+          description: ID of the Segment
+        connectorPredicate:
+          type: string
+        inOrNotInPredicate:
+          type: string
+        context:
+          $ref: '#/components/schemas/ContextEnum'
+        position:
+          type: integer
+          description: Indicates segment ordering in case of several Segment
+    Comparison:
+      type: object
+      description: Comparison definition
+      properties:
+        type:
+          type: string
+          description: Type of comparison
+          enum:
+            - NONE
+            - PERIOD
+            - LIMIT
+            - SLIDING_WINDOW
+        slidingWindowWeekdayAdjust:
+          type: boolean
+        slidingWindowTimeShift:
+          type: string
+          enum:
+            - PRECEDING
+            - PREVIOUS_MONTH
+            - PREVIOUS_QUARTER
+            - PREVIOUS_YEAR
+        filter:
+          $ref: '#/components/schemas/Filter'
     AnalysisQuery:
       type: object
+      description: Defintiona of a anaylsis query structure
       properties:
         resultType:
           type: string
@@ -128,67 +304,10 @@ components:
           enum:
             - DATA_ONLY
         queryObject:
-          type: object
-          description: Query definition
-          properties:
-            columns:
-              type: array
-              description: Array of columns
-              items:
-                type: object
-                properties:
-                  name:
-                    type: string
-                  sortDirection:
-                    type: string
-                    enum:
-                      - ASCENDING
-                      - DESCENDING
-                  sortIndex:
-                    type: integer
-                    description: Indicates order of sorting when there is more than one sorting column. (starting from 0).
-                  lowerLimit:
-                    type: integer
-                  upperLimit:
-                    type: integer
-                  columnPeriod:
-                    $ref: '#/components/schemas/ColumnPeriodEnum'
-                  scope:
-                    $ref: '#/components/schemas/ScopeEnum'
-                  context:
-                    $ref: '#/components/schemas/ContextEnum'
-                  predefinedContainer:
-                    $ref: '#/components/schemas/Container'
-            variant:
-              type: string
-              description: Type of Data Structure
-              enum:
-                - LIST
-                - PIVOT
-                - PIVOT_AS_LIST
-            predefinedContainer:
-              $ref: '#/components/schemas/Container'
-            predefinedSegmentConnections:
-              type: array
-              items:
-                type: object
-                properties:
-                  segmentID:
-                    type: string
-                    description: ID of the Segment
-                  connectorPredicate:
-                    type: string
-                  inOrNotInPredicate:
-                    type: string
-                  context:
-                    $ref: '#/components/schemas/ContextEnum'
-                  position:
-                    type: integer
-                    description: Indicates segment ordering in case of several Segment
-          required:
-            - columns
-            - variant
-            - predefinedContainer
+          description: Different type of queries are possible
+          oneOf:
+            - $ref: '#/components/schemas/TableQuery'
+            - $ref: '#/components/schemas/KpiQuery'
       required:
         - resultType
         - queryObject
@@ -213,7 +332,7 @@ components:
           description: Number of rows returned.
         rowCountTotal:
           type: integer
-          description: Number of rows in the whole resultSet
+          description: Number of rows in the whole resultSet wihtout subtotals
         headers:
           type: array
           items:
@@ -248,19 +367,10 @@ components:
                 type: integer
                 description: Indicates order of sorting when there is more than one sorting column. (starting from 0)
               sortDirection:
-                type: string
-                description: Sorting direction if any
-                enum:
-                  - ASCENDING
-                  - DESCENDING
+                $ref: '#/components/schemas/SortDirectionEnum'
         columnCount:
           type: integer
           description: Number of columns
-        information:
-          type: array
-          description: Array of information regarding calculation
-          items:
-            $ref: '#/components/schemas/Information'
         warnings:
           type: array
           description: Array of warnings occurred during calculation
@@ -268,58 +378,15 @@ components:
             $ref: '#/components/schemas/Warning'
         timerange:
           type: array
+          description: time range boundaries with format yyyy-MM-dd HH:mm:ss
           minItems: 2
           maxItems: 2
           items:
             type: string
-            format: date-time
-          description: Analysis timerange
         timestamp:
           type: string
           format: date-time
           description: Timestamp of the calculation
-    Information:
-      type: object
-      properties:
-        name:
-          type: string
-          description: |-
-            Each information has specific properties described in following table:
-            | Information| Description | Relevant parameters |
-            | ---------------- | ------------| -----------------------------------|
-            | SortingEnforced |  Sorting criteria has been added automatically | List of objects that were sorted automatically in _aliases_ array. |
-            | NoSortingDefined |  Sorting criteria is required for some dimensions. | List of dimensions requiring a sorting in _names_ array. |
-            | SortingLimitExceeded | 3 sorting criteria are allowed. All additional sorting criteria have been omitted.| List of columns ignored for sorting in _aliases_ array. |
-            | SortingRemoved | A requested sorting criteria has been removed | List of objects that were removed automatically in _aliases_ array. |
-          enum:
-            - SortingEnforced
-            - NoSortingDefined
-            - SortingLimitExceeded
-            - SortingRemoved
-        parameters:
-          type: object
-          properties:
-            arrangeTypes:
-              type: array
-              description: List of internal object names (dimension, metrics, filter, ...) that corresponds to the information.
-              items:
-                type: string
-            aliases:
-              type: array
-              description: List of columns aliases that corresponds to the information. See Result Header alias property.
-              items:
-                type: string
-            names:
-              type: array
-              description: List of object names (dimension, metrics, filter, ...) that corresponds to the information.
-              items:
-                type: string
-            daysInDataSource:
-              type: string
-              description: Number of days in the datasource which is beeing cut
-            todayDate:
-              type: string
-              description: Date of the day being cut
     Warning:
       type: object
       properties:
@@ -331,10 +398,18 @@ components:
             | ---------------- | ------------| -----------------------------------|
             | FilterLogicalCubeMismatch | At least one filter is ignored due to incompatibily with Dimensions and Metrics used. | List of incomptible filter objects in _names_ array. |
             | InvalidMetricContext | Metric used in an invalid context. | List of metric with invalid context in _aliases_ array. |
+            | SortingEnforced |  Sorting criteria has been added automatically | List of objects that were sorted automatically in _aliases_ array. |
+            | NoSortingDefined |  Sorting criteria is required for some dimensions. | List of dimensions requiring a sorting in _names_ array. |
+            | SortingLimitExceeded | 3 sorting criteria are allowed. All additional sorting criteria have been omitted.| List of columns ignored for sorting in _aliases_ array. |
+            | SortingRemoved | A requested sorting criteria has been removed | List of objects that were removed automatically in _aliases_ array. |
             | TodayRemoved | Today date has been removed from calculation time range because the selected datasource does not contain it. | daysInDataSource, todayDate|
           enum:
             - FilterLogicalCubeMismatch
             - InvalidMetricContext
+            - SortingEnforced
+            - NoSortingDefined
+            - SortingLimitExceeded
+            - SortingRemoved
             - TodayRemoved
         parameters:
           type: object
@@ -346,7 +421,7 @@ components:
                 type: string
             aliases:
               type: array
-              description: List of columns aliases that corresponds to the warning. See Result Header alias property.
+              description: List of columns aliases that corresponds to the error. See Result Header alias property.
               items:
                 type: string
             names:
