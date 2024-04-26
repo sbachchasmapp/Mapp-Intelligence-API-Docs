@@ -427,6 +427,8 @@ components:
             | SortingLimitExceeded | 3 sorting criteria are allowed. All additional sorting criteria have been omitted.| List of columns ignored for sorting in _aliases_ array. |
             | SortingRemoved | A requested sorting criteria has been removed | List of objects that were removed automatically in _aliases_ array. |
             | TodayRemoved | Today date has been removed from calculation time range because the selected datasource does not contain it. | daysInDataSource, todayDate|
+            | TimeFilterMissing | Each query must have a minimum of one Time Filter.| N/A |
+            | InvalidSegmentNoneContainer | A segment container has context set to NONE but either its connector is not set to AND or its inOrNotIn property is not set to IN.| N/A |
           enum:
             - FilterLogicalCubeMismatch
             - InvalidMetricContext
@@ -435,6 +437,8 @@ components:
             - SortingLimitExceeded
             - SortingRemoved
             - TodayRemoved
+            - TimeFilterMissing
+            - InvalidSegmentNoneContainer
         parameters:
           type: object
           properties:
