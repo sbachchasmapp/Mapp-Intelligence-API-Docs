@@ -5,6 +5,8 @@ info:
     OpenAPI 3.0 Specification of Mapp Intelligence Private AnalyticsAPI 
 
      In order to use these endpoints you must authorize by using a valid OAuth clientID configured in Mapp Intelligence Settings section.
+    
+    This API can be solelly used within Mapp Network.
   version: 1.0.0
   contact:
     name: Technical Support Mapp Digital
@@ -1452,6 +1454,19 @@ paths:
                 $ref: '#/components/examples/analysisQueryComparison'
               TimeSeries:
                 $ref: '#/components/examples/analysisQueryTimeSeries'
+      parameters:
+        - name: accountId
+          in: query
+          description: Id of the account where the query must be executed
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: query
+          description: Id of the user with which the query must be executed (User Filter etc...)
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: Analysis completed
@@ -1467,7 +1482,7 @@ paths:
                 Calculated data available:
                   value:
                     calculationId: 8612fa1eaada53fbb1956402bbded4db732074e7e399645880ae6a54b99a2bd9_294915650484552
-                    resultUrl: https://analytics-qa.nbg.webtrekk.com/analytics-service/intelligence-api/analysis-result/8612fa1eaada53fbb1956402bbded4db732074e7e399645880ae6a54b99a2bd9_294915650484552
+                    resultUrl: https://intelligence.eu.mapp.com/analytics/api/analysis-result/8612fa1eaada53fbb1956402bbded4db732074e7e399645880ae6a54b99a2bd9_294915650484552
         '201':
           description: Analysis enqueued
           content:
@@ -1482,7 +1497,7 @@ paths:
                 Query enqueued:
                   value:
                     correlationId: 94295cef-5b64-4934-ba25-011dd997aa81
-                    statusUrl: https://analytics-qa.nbg.webtrekk.com/analytics-service/intelligence-api/analysis-query/94295cef-5b64-4934-ba25-011dd997aa81
+                    statusUrl: https://intelligence.eu.mapp.com/analytics/api/analysis-query/94295cef-5b64-4934-ba25-011dd997aa81
         '403':
           $ref: '#/components/responses/Forbidden'
         '422':
@@ -1527,7 +1542,7 @@ paths:
                   value:
                     calculationId: 579d66fe984f72f7154c5f48e0d3d65741dac870eb337a0524d4d3db02f119b7_294915650484552
                     status: SUCCESS
-                    resultUrl: https://analytics-qa.nbg.webtrekk.com/analytics-service/intelligence-api/analysis-result/579d66fe984f72f7154c5f48e0d3d65741dac870eb337a0524d4d3db02f119b7_294915650484552
+                    resultUrl: https://intelligence.eu.mapp.com/analytics/api/analysis-result/579d66fe984f72f7154c5f48e0d3d65741dac870eb337a0524d4d3db02f119b7_294915650484552
                     details:
                       lastUpdatedAt: 1630430828912
         '403':
@@ -1592,6 +1607,13 @@ paths:
       description: Get number of analysis done for current month
       externalDocs:
         url: https://documentation.mapp.com
+      parameters:
+        - name: accountId
+          in: query
+          description: Id of the account whose the analysis usage is requested
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -1628,6 +1650,12 @@ paths:
           required: false
           schema:
             type: string
+        - name: accountId
+          in: query
+          description: Id of the account whose the query objects are requested
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -1648,6 +1676,13 @@ paths:
       description: List all available segments
       externalDocs:
         url: https://documentation.mapp.com
+      parameters:
+        - name: accountId
+          in: query
+          description: Id of the account whose segments are requested
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -1684,6 +1719,12 @@ paths:
 
             Default is  "en"
           required: false
+          schema:
+            type: string
+        - name: accountId
+          in: query
+          description: Id of the account whose the dynamic time filters are requested
+          required: true
           schema:
             type: string
       responses:
