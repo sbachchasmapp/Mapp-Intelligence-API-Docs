@@ -743,6 +743,48 @@ components:
         - maxCalculationsAllowed
         - month
         - year
+    ReportQueryRequest:
+      type: object
+      properties:
+        reportId:
+          type: integer
+          format: int64
+        reportElementIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+        reportConfiguration:
+          type: object
+          additionalProperties:
+            type: object
+        timeFilter:
+          type: object
+          additionalProperties:
+            type: object
+    ReportQueryState:
+      type: object
+      properties:
+        reportCorrelationId:
+          type: string
+        status:
+          type: string
+        details:
+          $ref: '#/components/schemas/ReportQueryStateDetails'
+        queryStates:
+          type: array
+          items:
+            $ref: '#/components/schemas/QueryState'
+    ReportQueryStateDetails:
+        type: object
+        properties:
+          lastUpdatedAt:
+            type: string
+            format: date-time
+          reportId:
+            type: string
+          reportTitle:
+            type: string
   responses:
     Forbidden:
       description: No permission to execute operation
@@ -1602,6 +1644,112 @@ paths:
                     year: 2022
         '403':
           $ref: '#/components/responses/Forbidden'
+
+  /accounts/{accountId}/report-query:
+    post:
+      tags:
+        - Analysis
+      summary: Create multiple calculation queries
+      description: Create multiple calculation queries
+      operationId: createReportQuery
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: language
+          in: query
+          required: false
+          schema:
+            type: string
+            default: en
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportQueryRequest'
+        required: true
+      responses:
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "422":
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ReportQueryState'
+  /report-query/{id}:
+    get:
+      tags:
+        - Analysis
+      summary: Get report query state
+      description: Get report query state
+      operationId: status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "422":
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ReportQueryState'
   /query-objects:
     get:
       tags:
