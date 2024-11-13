@@ -749,17 +749,21 @@ components:
         reportId:
           type: integer
           format: int64
+          description: Report Id
         reportElementIds:
           type: array
           items:
             type: integer
             format: int64
+            description: Report Element Ids
         reportConfiguration:
           type: object
+          description: Report Configuartion
           additionalProperties:
             type: object
         timeFilter:
           type: object
+          description: Time filter configuration
           additionalProperties:
             type: object
     ReportQueryState:
@@ -767,12 +771,15 @@ components:
       properties:
         reportCorrelationId:
           type: string
+          description: Correlation Id of the report
         status:
           type: string
+          description: Status of the report after complete analysis
         details:
           $ref: '#/components/schemas/ReportQueryStateDetails'
         queryStates:
           type: array
+          description: List of query state of all caculation queries
           items:
             $ref: '#/components/schemas/QueryState'
     ReportQueryStateDetails:
@@ -781,10 +788,13 @@ components:
           lastUpdatedAt:
             type: string
             format: date-time
+            description: Last updated time of report
           reportId:
             type: string
+            description: Report Unique Id
           reportTitle:
             type: string
+            description: Report Name
   responses:
     Forbidden:
       description: No permission to execute operation
