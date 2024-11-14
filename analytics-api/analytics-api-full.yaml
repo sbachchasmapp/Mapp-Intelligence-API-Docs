@@ -85,6 +85,9 @@ components:
         name:
           type: string
           description: Name of the Metric or Dimension being filtered.
+        arrangeType:
+          type: string
+          description: Custom/Predefined Arrange Type of the Dimension or Metric
         filterPredicate:
           $ref: '#/components/schemas/FilterPredicateEnum'
         connector:
@@ -743,6 +746,37 @@ components:
         - maxCalculationsAllowed
         - month
         - year
+    CustomParameter:
+      type: object
+      properties:
+        values:
+          type: array
+          description: List of possible values
+        configurable:
+          type: string
+          description: Indicates if the parameter is configurable
+
+    Report:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        title:
+          type: string
+        description:
+          type: string
+        reportElements:
+          description: Different type of queries are possible
+          oneOf:
+            - $ref: '#/components/schemas/TableQuery'
+            - $ref: '#/components/schemas/KpiQuery'
+        timeFilter:
+          $ref: '#/components/schemas/Filter'
+        dashboardQuickFilters:
+            $ref: '#/components/schemas/Filter'
+        dashboardQuickFilterValues:
+            $ref: '#/components/schemas/CustomParameter'
     ReportQueryRequest:
       type: object
       properties:
@@ -757,15 +791,10 @@ components:
             format: int64
             description: Report Element Ids
         reportConfiguration:
-          type: object
-          description: Report Configuartion
-          additionalProperties:
-            type: object
+          $ref: '#/components/schemas/Report'
+
         timeFilter:
-          type: object
-          description: Time filter configuration
-          additionalProperties:
-            type: object
+          $ref: '#/components/schemas/Filter'
     ReportQueryState:
       type: object
       properties:
@@ -1655,7 +1684,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
 
-  /accounts/{accountId}/report-query:
+  /report-query:
     post:
       tags:
         - Analysis
