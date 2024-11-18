@@ -749,6 +749,8 @@ components:
         values:
           type: array
           description: List of possible values
+          items:
+            type: string
         configurable:
           type: string
           description: Indicates if the parameter is configurable
@@ -758,11 +760,14 @@ components:
         id:
           type: integer
           format: int32
+          description: ID of the element
         reportId:
           type: integer
           format: int32
+          description: ID of the report
         type:
           type: string
+          description: Type of the element for eg. Analysis, KPI, Sparkline
         configJson:
           type: object
           description: Different type of queries are possible
@@ -775,6 +780,7 @@ components:
         id:
           type: integer
           format: int32
+          description: Report Id
         title:
           type: string
         description:
@@ -787,7 +793,10 @@ components:
         timeFilter:
           $ref: '#/components/schemas/Filter'
         dashboardQuickFilters:
-            $ref: '#/components/schemas/Filter'
+          type: array
+          items:
+              $ref: '#/components/schemas/Filter'
+
         dashboardQuickFilterValues:
             $ref: '#/components/schemas/CustomParameter'
     ReportQueryRequest:
@@ -1509,6 +1518,72 @@ components:
           - '2021-08-26T00:00:00.000+0200'
           - '2021-09-02T00:00:00.000+0200'
         timestamp: '2021-09-02T09:15:43.567+0200'
+    reportQueryObject:
+        value:
+          id: 3687
+          title: "! !!  ANALYTICS-2295"
+          description: ''
+          reportElements:
+            - id: 74943
+              reportId: 3687
+              type: ANALYSIS
+              configJson:
+                title: Analyis for example
+                columns:
+                  - name: time_days
+                    sortDirection: ASCENDING
+                    sortIndex: 1
+                    scope: OBJECT
+                    context: NONE
+                    lowerLimit: 1
+                    upperLimit: 28
+                  - name: visits
+                    columnPeriod: ANALYSIS
+                    scope: OBJECT
+                    context: SESSION
+                    variant: NORMAL
+                  - name: pages_pageImpressions
+                    columnPeriod: ANALYSIS
+                    scope: OBJECT
+                    context: PAGE
+                    variant: NORMAL
+                  - name: visits_newShare
+                    columnPeriod: ANALYSIS
+                    scope: OBJECT
+                    variant: NORMAL
+                  - name: visit_duration_avg
+                    columnPeriod: ANALYSIS
+                    scope: OBJECT
+                    variant: NORMAL
+                  - name: visits_bounceRate
+                    columnPeriod: ANALYSIS
+                    scope: OBJECT
+                    variant: NORMAL
+                variant: LIST
+          timeFilter:
+            name: time_range
+            connector: AND
+            filterPredicate: BETWEEN
+            value1: '2020-10-14'
+            value2: '2020-11-11'
+            context: NONE
+            caseSensitive: false
+          dashboardQuickFilters:
+            - arrangeType: custom_paras_session_generic42
+              connector: AND
+              filterPredicate: LIKE
+              value1: ''
+              value2: ''
+              context: NONE
+              caseSensitive: false
+              intern: false
+              numberOfDays: 0
+          dashboardQuickFilterValues:
+            custom_paras_session_generic42:
+              configurable: true
+              values: [ ]
+
+
 
 security:
   - oauth_security_scheme:
@@ -1709,6 +1784,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ReportQueryRequest'
+            examples:
+              ANALYSIS:
+                $ref: '#/components/examples/reportQueryObject'
+
         required: true
       responses:
         "404":
