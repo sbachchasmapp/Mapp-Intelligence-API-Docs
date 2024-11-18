@@ -85,9 +85,6 @@ components:
         name:
           type: string
           description: Name of the Metric or Dimension being filtered.
-        arrangeType:
-          type: string
-          description: Custom/Predefined Arrange Type of the Dimension or Metric
         filterPredicate:
           $ref: '#/components/schemas/FilterPredicateEnum'
         connector:
@@ -755,7 +752,23 @@ components:
         configurable:
           type: string
           description: Indicates if the parameter is configurable
-
+    ReportElement:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        reportId:
+          type: integer
+          format: int32
+        type:
+          type: string
+        configJson:
+          type: object
+          description: Different type of queries are possible
+          oneOf:
+            - $ref: '#/components/schemas/TableQuery'
+            - $ref: '#/components/schemas/KpiQuery'
     Report:
       type: object
       properties:
@@ -767,10 +780,10 @@ components:
         description:
           type: string
         reportElements:
-          description: Different type of queries are possible
-          oneOf:
-            - $ref: '#/components/schemas/TableQuery'
-            - $ref: '#/components/schemas/KpiQuery'
+          type: array
+          description: Array of columns
+          items:
+            $ref: '#/components/schemas/ReportElement'
         timeFilter:
           $ref: '#/components/schemas/Filter'
         dashboardQuickFilters:
@@ -1691,23 +1704,6 @@ paths:
       summary: Create multiple calculation queries
       description: Create multiple calculation queries
       operationId: createReportQuery
-      parameters:
-        - name: accountId
-          in: path
-          required: true
-          schema:
-            type: string
-        - name: userId
-          in: query
-          required: false
-          schema:
-            type: string
-        - name: language
-          in: query
-          required: false
-          schema:
-            type: string
-            default: en
       requestBody:
         content:
           application/json:
